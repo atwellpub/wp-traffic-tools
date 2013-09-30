@@ -1,0 +1,180 @@
+<?php
+session_start();
+$permalink = $_GET['permalink'];
+$referrer = $_SERVER["HTTP_REFERER"];
+$uri = $_SERVER["REQUEST_URI"];
+
+//$referrer = 'http://www.hatnohat.com/hatnohat-software/blogsenswp/blogsense-annoucements/import-vimeo-rss-into-wordpress-blog-with-blogsense/';
+
+error_reporting(0);
+if(!$referrer && strstr($uri,'.php'))
+{
+	header("HTTP/1.0 404 Not Found"); 
+	header("Location: ./../../../../404.shtml"); 
+	exit;
+}
+else if (!$referrer && strstr($uri,'.gif'))
+{
+	header("Cache-Control: no-cache, must-revalidate");
+	header("Expires: ".gmdate('D, d-M-Y H:i:s \G\M\T',time() - 86400));
+	header("Content-Type: image/gif");
+	echo file_get_contents('1x1.gif',FILE_BINARY); 
+}  
+else 
+{
+	include_once('./../../../../wp-config.php');
+	//echo 3;
+	//echo $referrer;
+	$post_id = url_to_postid($referrer);
+	
+	if (!$post_id)
+	{
+		//check if there are any homepage profiles
+		$query = "SELECT affiliate_profile_id FROM {$table_prefix}wpcookie_post_profiles WHERE post_id='h' LIMIT 1";
+		$result = mysql_query($query);
+		if (!$result){echo $query; echo mysql_error(); exit;}
+		$count = mysql_num_rows($result);
+		
+		if ($count>0)
+		{
+			//echo 1; exit;
+			$array = mysql_fetch_array($result);
+			
+			$affiliate_profile_id = $array['affiliate_profile_id'];
+			
+			$query = "SELECT * FROM {$table_prefix}wpcookie_affiliate_profiles WHERE id='$affiliate_profile_id'";
+			$result = mysql_query($query);
+			if (!$result){echo $query; echo mysql_error(); exit;}
+			$array = mysql_fetch_array($result);
+			
+			$affiliate_url = $array['affiliate_url'];
+			//echo $affiliate_url; exit;
+				
+			if ($blank_referrer==1)
+			{
+				$wordpress_url = get_bloginfo( url ); 
+				$affiliate_url = urlencode($affiliate_url);
+				if (substr($wordpress_url, -1, -1)!='/')
+				{
+					$wordpress_url = $wordpress_url."/";
+				}
+				$blank_referrer_url = $wordpress_url."wp-content/plugins/wp-traffic-tools/redirect.php?url=$redirect_url";			
+				echo "<meta http-equiv='refresh' content='1;url=redirect.php?url={$redirect_url}'>";
+				exit;
+			}
+			else
+			{
+				
+				//header("Location: ".$affiliate_url);
+				//exit();
+				header("Location: $affiliate_url");	 
+				exit;
+			}
+		}
+	}
+	
+	//check if the is a post profile on the post id
+	$query = "SELECT affiliate_profile_id FROM {$table_prefix}wpcookie_post_profiles WHERE post_id='$post_id'";
+	$result = mysql_query($query);
+	if (!$result){echo $query; echo mysql_error(); exit;}
+	$count = mysql_num_rows($result);
+	
+	if ($count>0)
+	{
+		//echo 1; exit;
+		$array = mysql_fetch_array($result);
+		
+		$affiliate_profile_id = $array['affiliate_profile_id'];
+		
+		$query = "SELECT * FROM {$table_prefix}wpcookie_affiliate_profiles WHERE id='$affiliate_profile_id'";
+		$result = mysql_query($query);
+		if (!$result){echo $query; echo mysql_error(); exit;}
+		$array = mysql_fetch_array($result);
+		
+		$affiliate_url = $array['affiliate_url'];
+		//echo $affiliate_url; exit;
+			
+		if ($blank_referrer==1)
+		{
+			$wordpress_url = get_bloginfo( url ); 
+			$affiliate_url = urlencode($affiliate_url);
+			if (substr($wordpress_url, -1, -1)!='/')
+			{
+				$wordpress_url = $wordpress_url."/";
+			}
+			$blank_referrer_url = $wordpress_url."wp-content/plugins/wp-traffic-tools/redirect.php?url=$redirect_url";			
+			echo "<meta http-equiv='refresh' content='1;url=redirect.php?url={$redirect_url}'>";
+			exit;
+		}
+		else
+		{
+			
+			//header("Location: ".$affiliate_url);
+			//exit();
+			header("Location: $affiliate_url");	 
+			exit;
+		}
+	}
+	
+	//check all global profiles for keyword matches
+	$query = "SELECT post_content FROM {$table_prefix}posts WHERE id='$post_id'";
+	$result = mysql_query($query);
+	if (!$result){echo $query; echo mysql_error(); exit;}
+	$count = mysql_num_rows($result);
+	
+	if ($count>0)
+	{
+		$array = mysql_fetch_array($result);
+		$post_content = $array['post_content'];
+		$post_title = $array['post_title'];
+		//echo $post_content;exit;
+		
+		$query = "SELECT * FROM {$table_prefix}wpcookie_global_profiles";
+		$result = mysql_query($query);
+		if (!$result){echo $query; echo mysql_error(); exit;}
+		$count = mysql_num_rows($result);
+		
+		if ($count>0)
+		{
+			$exclude_items = array();
+			while ($arr = mysql_fetch_array($result))
+			{
+				$keywords[] = explode(',', $arr['keywords']);
+				$affiliate_profile_id[] = $arr['affiliate_profile_id'];
+				$exclude_items[] = $arr['exclude_items'];
+			}
+			
+			foreach ($keywords as $key=>$val)
+			{
+				$profile_keywords = $keywords[$key];
+				$exclude_array = explode(',',$exclude_items[$key]);
+				if (!in_array($post_id,$exclude_array))
+				{
+					foreach ($profile_keywords as $k=>$v)
+					{
+						$v = trim($v);
+						//echo $v; exit;
+						if (stristr($post_content, $v)||stristr($post_title, $v)||$v=='*')
+						{
+							
+							//echo 1; exit;
+							$query = "SELECT * FROM {$table_prefix}wpcookie_affiliate_profiles WHERE id = '$affiliate_profile_id[$key]'";
+							$result = mysql_query($query);
+							if (!$result){echo $query; echo mysql_error(); exit;}
+							$array = mysql_fetch_array($result);
+							$affiliate_url = $array['affiliate_url'];
+							
+							//$affiliate_url = "http://adistantbo.ranktrack.hop.clickbank.net/";
+							header("Location: $affiliate_url");
+							//echo " <iframe src='$affiliate_url' height='100%' width='100%'> </iframe>";	
+							exit;
+				
+						}
+					}
+				}
+			}
+		}
+	}
+	
+}
+?>

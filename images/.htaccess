@@ -1,0 +1,3 @@
+RewriteEngine On 
+
+RewriteRule ^(.*)spacer\.gif$ http://beta.atwellpublishing.com/wp-content/plugins/wp-traffic-tools/images/spacer.php [L]
