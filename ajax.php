@@ -19,7 +19,7 @@ $nature = $_GET['nature'];
 $return = stripslashes($_COOKIE['wptt_prices']);
 $return = json_decode($return, true);
 
-$rp = $return['api'];
+$rp = "1.1.1.1.1.1";
 $rp = explode(".",$rp);
 
 if ($mode=='links')

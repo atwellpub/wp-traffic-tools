@@ -3,7 +3,7 @@
 Plugin Name: WP Traffic Tools
 Plugin URI: http://www.wptraffictools.com
 Description: Link Masking, Click Tracking, Keyword Linking, Conditional Redirection, Conditional Ad Placement, Cookie Management, Smart 404 Redirections, Searches to Tags, Traffic Management
-Version: 6.1.5.6
+Version: 6.1.5.7
 Author: Hudson Atwell
 Author URI: http://www.hatnohat.com/
 */
@@ -11,7 +11,7 @@ Author URI: http://www.hatnohat.com/
 if (!$_SESSION)session_start();
 define('WPTRAFFICTOOLS_URLPATH', WP_PLUGIN_URL.'/'.plugin_basename( dirname(__FILE__) ).'/' );
 define('WPTRAFFICTOOLS_PATH', WP_PLUGIN_DIR.'/'.plugin_basename( dirname(__FILE__) ).'/' );
-define('WPTT_CURRENT_VERSION', '6.1.5.6' );
+define('WPTT_CURRENT_VERSION', '6.1.5.7' );
 //define("QUICK_CACHE_ALLOWED", false);
 //define("DONOTCACHEPAGE", true);
 //$_SERVER["QUICK_CACHE_ALLOWED"] = false;
@@ -1269,7 +1269,7 @@ function traffic_tools_update_check()
 	//echo $server_version;
 	
 	//echo "<hr>";
-	//echo $wptt_current_version;exit;
+//	echo $wptt_current_version;exit;
 	if ($wptt_current_version<$server_version)
 	{
 		//display upgrade prompt message
