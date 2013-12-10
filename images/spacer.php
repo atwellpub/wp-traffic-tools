@@ -22,10 +22,10 @@ else
 }
 //echo $_COOKIE["pv"];exit;
 //$spider_check = $_COOKIE['wpttcheck'];
+$spider_check = 0;
 
 
-
-if ($spider_check!=1)
+if (!$spider_check!=1)
 {
 	//$this_referrer = '';
 	//$wptt_referrer = "";

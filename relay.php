@@ -1,5 +1,10 @@
 <?php
 
+define("QUICK_CACHE_ALLOWED", false); 
+define("DONOTCACHEPAGE", true); 
+define('DONOTCACHCEOBJECT', true); 
+define('DONOTCDN', true); 
+
 $keywords_nature = $_COOKIE['keywords_nature'];
 $keywords_query = $_COOKIE['keywords_query'];
 $spider_check = $_COOKIE['wpttcheck'];

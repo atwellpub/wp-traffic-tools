@@ -978,6 +978,9 @@ define('REDIRECT_URLPATH', WP_PLUGIN_URL.'/'.plugin_basename( dirname(__FILE__) 
 	{
 		if (is_admin())
 			return;
+		
+		if( strstr( $_SERVER["REQUEST_URI"] , 'wp-content') )
+			return;
 			
 		global $post;
 		global $table_prefix;
@@ -997,9 +1000,19 @@ define('REDIRECT_URLPATH', WP_PLUGIN_URL.'/'.plugin_basename( dirname(__FILE__) 
 		$post_id = url_to_postid($current_url);
 		if (!$post_id){	$post_id = wptt_url_to_postid_final($current_url); }
 		if (!$post_id){	$post_id = wptt_url_to_postid($current_url); }
-		
-		$cat = get_category_by_path(get_query_var('category_name'),false);
-		$category_id = $cat->cat_ID;
+	
+		if (get_query_var('category_name'))
+		{
+			$cat = get_category_by_path(get_query_var('category_name'),false);
+			$category_id = $cat->cat_ID;
+		}
+		else
+		{
+			$cat = get_the_category($post_id);
+			$cat = $cat[0];
+			$category_id = $cat->term_id;
+			
+		}
 		
 		//echo 1;
 		//echo $_SERVER['HTTP_REFERER'];exit;

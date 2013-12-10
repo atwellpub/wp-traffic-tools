@@ -96,7 +96,7 @@
 			$url = "http://www.hatnohat.com/api/wp-traffic-tools/validate.php?mode=2&key={$global_wptt}&email={$global_wptt_handle}";
 			$rp = "1.1.1.1.1.1";
 			$rp = explode(".",$rp);
-			
+			$rp=1;
 		}
 		else
 		{
