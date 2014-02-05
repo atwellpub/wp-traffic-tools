@@ -793,6 +793,7 @@
 			}
 			
 			$rotate_urls = $_POST['rotate_urls'];
+			$rotate_urls_count = $_POST['rotate_urls_count'];
 			$blank_referrer = $_POST['blank_referrer'];
 			$spoof_referrer_url = $_POST['spoof_referrer_url'];
 			$redirect_spider = $_POST['redirect_spider'];
@@ -831,13 +832,13 @@
 				}
 				if ($profile_id!='x')
 				{
-					$query = "UPDATE {$table_prefix}wptt_cloakme_profiles SET link_masking='$link_masking' ,permalink='$permalink' , classification_prefix='$classification_prefix', cloaked_url='$cloaked_link', redirect_url='$redirect_url', rotate_urls='$rotate_urls', blank_referrer='$blank_referrer', spoof_referrer_url='$spoof_referrer_url', redirect_spider='$redirect_spider', redirect_method='$redirect_method', redirect_method_url='$redirect_method_url', redirect_type='$redirect_type', cloak_target='$cloak_target', stuff_cookie='$stuff_cookie', keywords = '$keywords', keywords_affect = '$keywords_affect', attributes = '$attributes', keywords_limit = '$keywords_limit', keywords_limit_total = '$keywords_limit_total', keywords_target_page = '$keywords_target_page' , notes = '$notes' WHERE id='$profile_id'";
+					$query = "UPDATE {$table_prefix}wptt_cloakme_profiles SET link_masking='$link_masking' ,permalink='$permalink' , classification_prefix='$classification_prefix', cloaked_url='$cloaked_link', redirect_url='$redirect_url', rotate_urls='$rotate_urls', rotate_urls_count='$rotate_urls_count', blank_referrer='$blank_referrer', spoof_referrer_url='$spoof_referrer_url', redirect_spider='$redirect_spider', redirect_method='$redirect_method', redirect_method_url='$redirect_method_url', redirect_type='$redirect_type', cloak_target='$cloak_target', stuff_cookie='$stuff_cookie', keywords = '$keywords', keywords_affect = '$keywords_affect', attributes = '$attributes', keywords_limit = '$keywords_limit', keywords_limit_total = '$keywords_limit_total', keywords_target_page = '$keywords_target_page' , notes = '$notes' WHERE id='$profile_id'";
 					$result = mysql_query($query);
 					if (!$result) { echo $query; echo mysql_error(); }
 				}
 				else
 				{
-					$query = "INSERT INTO {$table_prefix}wptt_cloakme_profiles (`id`,`link_masking`,`classification_prefix`,`permalink`,`cloaked_url`,`redirect_url`,`rotate_urls`,`blank_referrer`,`spoof_referrer_url`,`redirect_spider`,`redirect_method`,`redirect_method_url`,`redirect_type`,`cloak_target`,`stuff_cookie`,`visitor_count`,`spider_count`,`type`,`keywords`,`keywords_affect`,`attributes`,`keywords_limit`,`keywords_limit_total`,`keywords_target_page`,`notes`) VALUES ('','$link_masking','$classification_prefix','$permalink','$cloaked_link','$redirect_url','$rotate_urls','$blank_referrer','$spoof_referrer_url','$redirect_spider','$redirect_method','$redirect_method_url','$redirect_type','$cloak_target','$stuff_cookie','0','0','affiliate','$keywords','$keywords_affect','$attributes','$keywords_limit','$keywords_limit_total','$keywords_target_page','$notes')";
+					$query = "INSERT INTO {$table_prefix}wptt_cloakme_profiles (`id`,`link_masking`,`classification_prefix`,`permalink`,`cloaked_url`,`redirect_url`,`rotate_urls`,`rotate_urls_count`,`blank_referrer`,`spoof_referrer_url`,`redirect_spider`,`redirect_method`,`redirect_method_url`,`redirect_type`,`cloak_target`,`stuff_cookie`,`visitor_count`,`spider_count`,`type`,`keywords`,`keywords_affect`,`attributes`,`keywords_limit`,`keywords_limit_total`,`keywords_target_page`,`notes`) VALUES ('','$link_masking','$classification_prefix','$permalink','$cloaked_link','$redirect_url','$rotate_urls','$rotate_urls_count','$blank_referrer','$spoof_referrer_url','$redirect_spider','$redirect_method','$redirect_method_url','$redirect_type','$cloak_target','$stuff_cookie','0','0','affiliate','$keywords','$keywords_affect','$attributes','$keywords_limit','$keywords_limit_total','$keywords_target_page','$notes')";
 					$result = mysql_query($query);
 					if (!$result) { echo $query; echo mysql_error(); }
 				}

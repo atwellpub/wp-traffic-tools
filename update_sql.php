@@ -213,6 +213,15 @@ for ($i=0;$i<$count;$i++)
 		ECHO "<HR>";
 	}
 
+	//print_r($wptt_options);exit;
+	if ($current_version<'6.2.1.1'||$_GET['all']==1)
+	{
+		//rename tables to standardized format
+		$sql = "ALTER TABLE {$table_prefix}wptt_cloakme_profiles  ADD  rotate_urls_count INT(9)";
+		$result = $wpdb->get_results($sql, ARRAY_A);
+		//if (!$result){ echo $sql; echo mysql_error(); exit;}
+	}
+	
 	//echo $current_version; exit;
 	if ($current_version<'6.1.4.3'||$_GET['all']==1)
 	{
@@ -401,6 +410,8 @@ for ($i=0;$i<$count;$i++)
 		
 	}
 
+
+	
 	//print_r($wptt_options);exit;
 	if ($current_version<'5.2.1.8'||$_GET['all']==1)
 	{

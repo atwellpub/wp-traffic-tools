@@ -50,6 +50,8 @@ if ($mode=='links')
 		$cloaking_redirect_type = $arr['redirect_type'];
 		$cloaking_redirect_url = $arr['redirect_url'];
 		$cloaking_rotate_urls = $arr['rotate_urls'];
+		$cloaking_rotate_urls_count = $arr['rotate_urls_count'];
+		($cloaking_rotate_urls_count) ? $cloaking_rotate_urls_count = $cloaking_rotate_urls_count : $cloaking_rotate_urls_count = 1;
 		$cloaking_redirect_spider = $arr['redirect_spider'];
 		$cloaking_blank_referrer = $arr['blank_referrer'];
 		$cloaking_spoof_referrer_url = $arr['spoof_referrer_url'];
@@ -193,6 +195,18 @@ if ($mode=='links')
 									<option value='0' <?php if ($cloaking_rotate_urls==0){ echo "selected='true'"; } ?>>No</option>
 									<option value='1' <?php if ($cloaking_rotate_urls==1){ echo "selected='true'"; } ?>>Yes</option>
 								</select>
+							</td>
+						</tr>
+						<tr <?php if ($cloaking_link_masking==0&&$nature=='edit'){echo "style='display:none;'";}?>>
+							<td style='border:0'>
+								<label for=keyword>
+									<img src="<?php echo WPTRAFFICTOOLS_URLPATH; ?>images/tip.png" style="cursor:pointer;" border=0 title="Set this value to determine how many times a URL will be shown to a visitor before it is rotated. ">
+									Rotate URLs - Show Count
+								</label>
+							</td>
+							<td style='border:0'>
+								<input type='text' name='rotate_urls' value = '<?php echo $cloaking_rotate_urls_count; ?>'>
+			
 							</td>
 						</tr>
 						<tr class='class_tr_link_masking' <?php if ($cloaking_link_masking==0&&$nature=='edit'){echo "style='display:none;'";}?>>

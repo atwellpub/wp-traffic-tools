@@ -3,7 +3,7 @@
 Plugin Name: WP Traffic Tools
 Plugin URI: http://www.wptraffictools.com
 Description: Link Masking, Click Tracking, Keyword Linking, Conditional Redirection, Conditional Ad Placement, Cookie Management, Smart 404 Redirections, Searches to Tags, Traffic Management
-Version: 6.1.5.7
+Version: 6.2.1.1
 Author: Hudson Atwell
 Author URI: http://www.hatnohat.com/
 */
@@ -11,7 +11,7 @@ Author URI: http://www.hatnohat.com/
 if (!$_SESSION)session_start();
 define('WPTRAFFICTOOLS_URLPATH', WP_PLUGIN_URL.'/'.plugin_basename( dirname(__FILE__) ).'/' );
 define('WPTRAFFICTOOLS_PATH', WP_PLUGIN_DIR.'/'.plugin_basename( dirname(__FILE__) ).'/' );
-define('WPTT_CURRENT_VERSION', '6.1.5.7' );
+define('WPTT_CURRENT_VERSION', '6.2.1.1' );
 //define("QUICK_CACHE_ALLOWED", false);
 //define("DONOTCACHEPAGE", true);
 //$_SERVER["QUICK_CACHE_ALLOWED"] = false;
@@ -613,7 +613,8 @@ function cloakme_activate()
 			permalink VARCHAR(255) NOT NULL UNIQUE,
 			cloaked_url VARCHAR(255) NOT NULL,
 			redirect_url TEXT NOT NULL,			
-			rotate_urls INT(1) NOT NULL,			
+			rotate_urls INT(1) NOT NULL,		
+			rotate_urls_count INT(9) NOT NULL,		
 			rotate_marker INT(3) NOT NULL,			
 			redirect_spider INT(10) NOT NULL,
 			redirect_method VARCHAR(10) NOT NULL,
@@ -1166,7 +1167,7 @@ function traffic_tools_activation_check()
 		if ($string==1)
 		{
 
-			setcookie('wptt_prices', '{"1":"16.97","2":"16.97","3":"16.97","4":"16.97","5":"16.97","api":"1.1.1.1.1.1.1"}' ,time()+1800,"/");
+			//setcookie('wptt_prices', '{"1":"16.97","2":"16.97","3":"16.97","4":"16.97","5":"16.97","api":"1.1.1.1.1.1.1"}' ,time()+1800,"/");
 			
 			$wptt_options = json_encode($wptt_options);
 			$multisite=0;
@@ -1675,6 +1676,7 @@ function wptt_filter_spiders()
 	}
 			
 	//check to make sure useragent is present
+
 	foreach ($useragents as $k=>$v)
 	{
 		$v = trim($v);
@@ -1682,16 +1684,16 @@ function wptt_filter_spiders()
 		{					
 			if ($ip_addresses)
 			{
-			        echo "herehere:$ip_addresses";exit;
 				if ($shadowmaker_username)
 				{
 					$query = "SELECT * FROM wptt_ip_addresses WHERE string = '$visitor_ip' LIMIT 1";
 					$result = mysql_query($query);
 					if (!$result) { echo $query; echo mysql_error(); exit;}	
 					$count = mysql_num_rows($result);
-					if ($count==0)
+					if ($count>0)
 					{
-						return 1;
+						//is spider cause ip is in db
+						return 0;
 					}
 				}
 				else
@@ -1702,6 +1704,7 @@ function wptt_filter_spiders()
 					{
 						if($visitor_ip==$val)
 						{
+							//is spider because ip is in db
 							return 0;
 						}
 					}
@@ -1710,6 +1713,7 @@ function wptt_filter_spiders()
 			}
 			else
 			{
+				//is not spider because useragent is in whitelist
 				return 1;
 			}
 		}			

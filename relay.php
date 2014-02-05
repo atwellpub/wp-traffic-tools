@@ -197,9 +197,11 @@ while ($arr = mysql_fetch_array($result))
 {
 	
 	$release = 0;
+	$redirect_id = $arr['id'];
 	$redirect_url = $arr['redirect_url'];
 	
 	$rotate_urls = $arr['rotate_urls'];
+	$rotate_urls_count = $arr['rotate_urls_count'];
 	$rotate_marker = $arr['rotate_marker'];
 	$blank_referrer = $arr['blank_referrer'];
 	$spoof_referrer_url = trim($arr['spoof_referrer_url']);
@@ -313,23 +315,39 @@ if ($go==1)
 
 			$count = count($redirect_url);
 			
-			if(empty($rotate_marker))
+			$rotate_count_marker = get_option('wptt_rotate_count_'.$redirect_id, 0);
+			
+			if ($rotate_count_marker>$rotate_urls_count)
 			{
-				$rotate_marker = 0;
-				$next_key = 1;
-			}
-			else
-			{		
-				if ($rotate_marker>=$count)
+				update_option('wptt_rotate_count_'.$redirect_id, 1 );
+				if(empty($rotate_marker))
 				{
-					$next_key = 1;
 					$rotate_marker = 0;
+					$next_key = 1;
 				}
 				else
-				{
-					//echo '<br>'.$count.'<br>ohthere:'.$rotate_marker;
-					$next_key = $rotate_marker+1;
+				{		
+					if ($rotate_marker>=$count)
+					{
+						$next_key = 1;
+						$rotate_marker = 0;
+					}
+					else
+					{
+						//echo '<br>'.$count.'<br>ohthere:'.$rotate_marker;
+						$next_key = $rotate_marker+1;
+					}
 				}
+			}
+			else
+			{				
+				if(empty($rotate_marker))
+					$rotate_marker = 0;
+				
+				$next_key = 0;
+				
+				$rotate_count_marker++;
+				update_option('wptt_rotate_count_'.$redirect_id, $rotate_count_marker);
 			}
 			
 			$query = "UPDATE {$table_prefix}wptt_cloakme_profiles SET rotate_marker='{$next_key}' WHERE permalink='$permalink'";

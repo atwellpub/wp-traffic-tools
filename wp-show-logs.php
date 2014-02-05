@@ -8,6 +8,9 @@ if (substr($wordpress_url, -1)!='/')
 	$wordpress_url = $wordpress_url."/";
 }
 
+if ( !is_user_logged_in() ) 
+	EXIT;
+
 $permalink = $_GET['permalink'];
 
 $query = "SELECT * FROM {$table_prefix}wptt_cloakme_profiles WHERE permalink='$permalink' LIMIT 1";
