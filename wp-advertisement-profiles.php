@@ -2078,34 +2078,21 @@ function wptt_advertisements_load_widgets() {
 		advertisements_add_javascript();
 		traffic_tools_javascript();
 		traffic_tools_update_check();
-		
-		traffic_tools_activation_check();
 	
-		//if active show rest of page
-		if (strlen($global_wptt)>2)
-		{
-			include('wptt_style.php');
-			echo "<img src='".WPTRAFFICTOOLS_URLPATH."images/wptt_logo.png'>";
-			
-			echo "<div id='id_wptt_display' class='class_wptt_display'>";
-		
-			echo '<div class="wrap">';
 
-			echo "<h2>Advertisement Profiles</h2>";
-			wptt_advertisements_settings();
-			wptt_display_footer();
-			echo '</div>';
-			echo '</div>';
-
-		}
-		else
-		{
-			//CSS CONTENT
-			include('wptt_style.php');
-			traffic_tools_activate_prompt(); 
-			exit;
-		}
+		include('wptt_style.php');
+		echo "<img src='".WPTRAFFICTOOLS_URLPATH."images/wptt_logo.png'>";
 		
+		echo "<div id='id_wptt_display' class='class_wptt_display'>";
+	
+		echo '<div class="wrap">';
+
+		echo "<h2>Advertisement Profiles</h2>";
+		wptt_advertisements_settings();
+		wptt_display_footer();
+		echo '</div>';
+		echo '</div>';
+
 	}
 	
     

@@ -13,57 +13,7 @@
 	if ( !defined('ABSPATH') )
 	define('ABSPATH', dirname(__FILE__) . '/');
 
-	
-	//ADD BUTTON TO TINYMCE
-	//*****************************************
-	//*****************************************
-	//*****************************************
-	//*****************************************
-	//*****************************************
-	//*****************************************
-	class cloakme_post_shortcode_button 
-	{
-		var $pluginname = "cloakme";
 
-		function cloakme_post_shortcode_button()  {
-			// Modify the version when tinyMCE plugins are changed.
-			add_filter('tiny_mce_version', array (&$this, 'change_tinymce_version') );
-			
-			// init process for button control
-			add_action('init', array (&$this, 'add_buttons') );
-		}
-
-		function add_buttons() {
-			// Don't bother doing this stuff if the current user lacks permissions
-			if ( !current_user_can('edit_posts') && !current_user_can('edit_pages') ) return;
-			
-			// Add only in Rich Editor mode
-			if ( get_user_option('rich_editing') == 'true') {
-				// add the button for wp2.5 in a new way
-				add_filter("mce_external_plugins", array (&$this, "add_tinymce_plugin" ), 5);
-				add_filter('mce_buttons', array (&$this, 'register_button' ), 5);
-			}
-		}
-		
-		// used to insert button in wordpress 2.5x editor
-		function register_button($buttons) {
-			array_push($buttons, "separator", $this->pluginname );
-			return $buttons;
-		}
-		
-		// Load the TinyMCE plugin : editor_plugin.js (wp2.5)
-		function add_tinymce_plugin($plugin_array) {    
-			$plugin_array[$this->pluginname] =  WPTRAFFICTOOLS_URLPATH.'tinymce/editor_plugin.js';
-			return $plugin_array;
-		}
-		
-		function change_tinymce_version($version) {
-			return ++$version;
-		}
-	}
-	
-	$tinymce_button = new cloakme_post_shortcode_button();	
-	
 	//ADD MENU ITEM AND OPTIONS PAGE
 	//*****************************************
 	//*****************************************
@@ -972,33 +922,23 @@ RewriteRule ^(.*)spacer\.gif$ ".WPTRAFFICTOOLS_URLPATH."images/spacer.php [L]";
 		traffic_tools_javascript();
 		cloakme_update_settings();
 		cloakme_add_javascript();
-		
-		traffic_tools_activation_check();
 		traffic_tools_update_check();
 		
 		//CSS CONTENT
 		include('wptt_style.php');
 		//if active show rest of page
-		if (strlen($global_wptt)>2)
-		{			
-			echo "<img src='".WPTRAFFICTOOLS_URLPATH."images/wptt_logo.png'>";
-			
-			echo "<div id='id_wptt_display' class='class_wptt_display'>";
+	
+		echo "<img src='".WPTRAFFICTOOLS_URLPATH."images/wptt_logo.png'>";
 		
-			echo '<div class="wrap">';
+		echo "<div id='id_wptt_display' class='class_wptt_display'>";
+	
+		echo '<div class="wrap">';
 
-			echo "<h2>Link Profiles</h2>";
-				
-			/* Show the existing options */
-			wptt_cloakme_settings();
-		}
-		else
-		{
-			//CSS CONTENT
-			include('wptt_style.php');
-			traffic_tools_activate_prompt(); 
-		}
+		echo "<h2>Link Profiles</h2>";
 			
+		/* Show the existing options */
+		wptt_cloakme_settings();
+
 		wptt_display_footer();
 		echo "</div>";
 		echo '</div>';

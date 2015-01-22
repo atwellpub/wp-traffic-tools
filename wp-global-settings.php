@@ -186,14 +186,20 @@ if ($global_shadowmaker_username)
 {
 	//echo wp_next_scheduled('wptt_shadowmaker_update_cron');exit;
 	if (!wp_next_scheduled('wptt_shadowmaker_update_cron')) {
-		wp_schedule_event(time(), 'twicedaily', 'wptt_shadowmaker_update_cron' );
+		wp_schedule_event(time(), 'hourly', 'wptt_shadowmaker_update_cron' );
 	}
 
 	add_action('wptt_shadowmaker_update_cron', 'wptt_shadowmaker_update_execute');
+	
+	if (isset($_GET['update_iplist'])) {        
+	    add_action('admin_init', 'wptt_shadowmaker_update_execute');
+	}
 }
 
 function wptt_shadowmaker_update_execute()
 {
+
+    
 	global $global_shadowmaker_username;
 	global $global_shadowmaker_password;
 	global $wptt_options; 
@@ -211,7 +217,7 @@ function wptt_shadowmaker_update_execute()
 	curl_close($ch);
 	//echo 1; exit;
 	//echo $data;exit;
-	
+
 	if (trim($data)>10)
 	{			
 		$date = date('m/d/Y h:i:s a', time());
@@ -222,25 +228,34 @@ function wptt_shadowmaker_update_execute()
 		$data = nl2br($data);			
 		$data = explode('<br />', $data);
 		$i = 0;
+		$query = "INSERT INTO wptt_ip_addresses (`id`,`string`) VALUES ";
 		foreach ($data as $val)
 		{
 			$val = trim($val);
-			$query = "INSERT INTO wptt_ip_addresses (`id`,`string`) VALUES ('','$val') ON DUPLICATE KEY UPDATE string='$val'";
-			$result = mysql_query($query);
-			if (!$result) { echo $query; echo mysql_error(); exit;}	
+			if (!$val) {
+			    continue;
+			}
+			
+			$query .= "('','$val'),";
+			
 			$i++;
 			//$ip_addresses = "Shadowmaker enabled & populated with $i IP Addresses. Last Updated $date .";
-			//echo $ip_addresses;
-			
+			//echo $ip_addresses
 		}
+		$query = substr( $query , 0 , -1 );
 		
-		$ip_addresses_array = $wptt_options['ip_addresses'];
+		$result = mysql_query($query);
+		if (!$result) { echo $query; echo mysql_error(); exit;}	
+		
+		//print_r($ip_addresses);exit;
+		$ip_addresses_array = explode(';',  $wptt_options['ip_addresses']);
+
 		if (is_array($ip_addresses_array))
 		{
 			foreach ($ip_addresses_array as $val)
 			{
 				$val = trim($val);
-				$query = "INSERT INTO wptt_ip_addresses (`id`,`string`) VALUES ('','$val') ON DUPLICATE KEY UPDATE string='$val'";
+				$query = "INSERT INTO wptt_ip_addresses (`id`,`string`) VALUES ('','$val') ";
 				$result = mysql_query($query);
 				if (!$result) { echo $query; echo mysql_error(); exit;}						
 			}
@@ -258,7 +273,7 @@ function retrieve_shadowmaker_ips($username,$password)
 	curl_setopt($ch, CURLOPT_URL,$url); 
 	curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
 	curl_setopt($ch, CURLOPT_USERPWD, "$username:$password");  
-	curl_setopt($ch, CURLOPT_FOLLOWLOCATION,1);
+	//curl_setopt($ch, CURLOPT_FOLLOWLOCATION,1);
 	curl_setopt ($ch, CURLOPT_RETURNTRANSFER, 1);
 	$data = curl_exec($ch); 
 	curl_close($ch);
@@ -316,8 +331,9 @@ function global_update_spider_settings()
 		if ($shadowmaker_username)
 		{
 			$query = "TRUNCATE wptt_ip_addresses";
-				$result = mysql_query($query);
-				if (!$result) { echo $query; echo mysql_error(); exit;}	
+			$result = mysql_query($query);
+			if (!$result) { echo $query; echo mysql_error(); exit;}	
+			
 			$data = retrieve_shadowmaker_ips($shadowmaker_username,$shadowmaker_password);
 			if (trim($data)>10)
 			{				
@@ -328,28 +344,37 @@ function global_update_spider_settings()
 				$data = nl2br($data);			
 				$data = explode('<br />', $data);
 				$i = 0;
+				
+				$query = "INSERT INTO wptt_ip_addresses (`id`,`string`) VALUES ";
 				foreach ($data as $val)
 				{
 					$val = trim($val);
-					$query = "INSERT INTO wptt_ip_addresses (`id`,`string`) VALUES ('','$val') ON DUPLICATE KEY UPDATE string='$val'";
-					$result = mysql_query($query);
-					if (!$result) { echo $query; echo mysql_error(); exit;}	
+					if (!$val) {
+						continue;
+					}					
+					$query .= "('','$val'),";
+					
 					$i++;
-				}				
+				}
+				$query = substr( $query , 0 , -1 );	
+				$result = mysql_query($query);
+				if (!$result) { echo $query; echo mysql_error(); exit;}					
 			}
 			
-			if (is_array($ip_addresses_array))
-			{
-				foreach ($ip_addresses_array as $val)
-				{
-					$val = trim($val);
-					$query = "INSERT INTO wptt_ip_addresses (`id`,`string`) VALUES ('','$val') ON DUPLICATE KEY UPDATE string='$val'";
-					$result = mysql_query($query);
-					if (!$result) { echo $query; echo mysql_error(); exit;}						
-				}
-			}
+			
 		}
 		
+		if (is_array($ip_addresses_array))
+		{
+			foreach ($ip_addresses_array as $val)
+			{
+				$val = trim($val);
+				$query = "INSERT INTO wptt_ip_addresses (`id`,`string`) VALUES ('','$val') ON DUPLICATE KEY UPDATE string='$val'";
+				$result = mysql_query($query);
+				if (!$result) { echo $query; echo mysql_error(); exit;}						
+			}
+		}
+			
 		$wptt_options['useragents'] = $useragents;
 		$wptt_options['ip_addresses'] = $ip_addresses;		
 		$wptt_options['shadowmaker_username'] = $shadowmaker_username;		
@@ -435,7 +460,7 @@ function wptt_spider_settings()
 						<td  valign='top'>	
 														
 										<img src="<?php echo WPTRAFFICTOOLS_URLPATH;; ?>images/tip.png" style="cursor:pointer;" border=0 title="WP Redirect will not redirect any of these IP Addresses. To block ip ranges use wildcards (eg: 156.201.*.*)">
-										Blocked IPs
+										Additional Spider IP Definitions
 										<br>
 										<i> <font style='font-size:9px'>1 per line</font></i>
 									
@@ -449,7 +474,7 @@ function wptt_spider_settings()
 										<td colspan=2>
 											<img src="<?php echo WPTRAFFICTOOLS_URLPATH;; ?>images/tip.png" style="cursor:pointer;" border=0 title="Spider IP Detection & Delivery Service provided by http://bseolized.com/. IP list is updated daily. ">
 											Shadowmaker IP Delivery Service &nbsp;&nbsp; <br>
-											[<small><em><a href='http://bseolized.com/coupon/index.php?hash=WPTT-9' target='_blank' title='WP Traffic Tools customers are provided with 30.00 off the yearly subscription costs. If you are already a member of the Shadow Maker service please contact the administrator for credentials that will work with WP Traffic tools.'>Register Here</a></em></small>]
+											[<small><em><a href='http://bseolized.com/affiliate/idevaffiliate.php?id=102_1' target='_blank' title='WP Traffic Tools customers are provided with 30.00 off the yearly subscription costs. If you are already a member of the Shadow Maker service please contact the administrator for credentials that will work with WP Traffic tools.'>Register Here</a></em></small>]
 											<br><br>
 										</td>
 									</tr>
@@ -466,7 +491,7 @@ function wptt_spider_settings()
 											Password:
 										</td>
 										<td>
-											<input name='shadowmaker_password' value='<?php echo $shadowmaker_password; ?>'>
+											<input type='password' name='shadowmaker_password' value='<?php echo $shadowmaker_password; ?>'>
 										</td>
 									</tr>
 									<tr>

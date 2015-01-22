@@ -791,245 +791,6 @@ function redirect_activate()
 	}
 }
 
-function advertisements_activate()
-{
-   global $wpdb;	
-   
-	
-	if ( !empty($wpdb->charset) )
-		$charset_collate = "DEFAULT CHARACTER SET $wpdb->charset";
-	
-	if ( ! function_exists( 'is_plugin_active_for_network' ) )
-    require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
-    // Makes sure the plugin is defined before trying to use it
- 
-	if ( is_plugin_active_for_network( 'wp-traffic-tools/wp-traffic-tools.php') ) {
-		if (function_exists('is_multisite') && is_multisite()) {       
-				$old_blog = $wpdb->blogid;
-				$blogids = $wpdb->get_col($wpdb->prepare("SELECT blog_id FROM $wpdb->blogs"));
-				$multisite = 1;        
-		}
-	}
-	
-	//print_r($blogids);exit;
-		
-	if (count($blogids)>1)
-	{
-		$count = count($blogids);
-	}
-	else
-	{
-		$count=1;
-	}
-	
-	for ($i=0;$i<$count;$i++)
-	{
-		if ($multisite==1)
-		{
-			 switch_to_blog($blogids[$i]);
-		}
-	
-		$sql = "CREATE TABLE {$wpdb->prefix}wptt_advertisements_content_profiles (
-			id INT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-			content TEXT NOT NULL,
-			profile_name VARCHAR(255) NOT NULL
-			) {$charset_collate};";
-
-		$result = $wpdb->get_results($sql, ARRAY_A);	
-		
-		$sql = "CREATE TABLE {$wpdb->prefix}wptt_advertisements_post_profiles (
-			id INT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-			post_id VARCHAR(12) NOT NULL,
-			content_profile_id VARCHAR(12) NOT NULL,
-			placement VARCHAR(25) NOT NULL,
-			geotargeting VARCHAR(255) NOT NULL,
-			drop_count INT(12) NOT NULL
-			) {$charset_collate};";
-
-		$result = $wpdb->get_results($sql, ARRAY_A);
-		
-		$sql = "CREATE TABLE {$wpdb->prefix}wptt_advertisements_keywords_profiles (
-			id INT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-			keywords VARCHAR(225) NOT NULL,
-			content_profile_id VARCHAR(12) NOT NULL,
-			placement VARCHAR(25) NOT NULL,
-			geotargeting VARCHAR(255) NOT NULL,
-			search_content INT(1) NOT NULL,
-			search_referral INT(1) NOT NULL,
-			status INT(1) NOT NULL,
-			drop_count INT(12) NOT NULL
-			) {$charset_collate};";
-
-		$result = $wpdb->get_results($sql, ARRAY_A);
-		
-		$sql = "CREATE TABLE {$wpdb->prefix}wptt_advertisements_google_profiles (
-			id INT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-			content_profile_id VARCHAR(12) NOT NULL,
-			placement VARCHAR(25) NOT NULL,
-			status INT(1) NOT NULL,
-			drop_count INT(12) NOT NULL
-			) {$charset_collate};";
-
-		$result = $wpdb->get_results($sql, ARRAY_A);
-		
-		$sql = "CREATE TABLE {$wpdb->prefix}wptt_advertisements_category_profiles (
-			id INT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-			content_profile_id VARCHAR(12) NOT NULL,
-			category_id INT(10) NOT NULL,
-			placement VARCHAR(25) NOT NULL,
-			geotargeting VARCHAR(255) NOT NULL,
-			status INT(1) NOT NULL,
-			drop_count INT(12) NOT NULL
-			) {$charset_collate};";
-
-		$result = $wpdb->get_results($sql, ARRAY_A);
-	}
-	
-	if ($multisite==1)
-	{
-		switch_to_blog($old_blog);
-	}
-	
-}
-
-function cookie_activate() 
-{
-   global $wpdb;   
-	
-	if ( !empty($wpdb->charset) )
-		$charset_collate = "DEFAULT CHARACTER SET $wpdb->charset";
-	
-	if ( ! function_exists( 'is_plugin_active_for_network' ) )
-    require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
-    // Makes sure the plugin is defined before trying to use it
- 
-	if ( is_plugin_active_for_network( 'wp-traffic-tools/wp-traffic-tools.php') ) {
-		if (function_exists('is_multisite') && is_multisite()) {       
-				$old_blog = $wpdb->blogid;
-				$blogids = $wpdb->get_col($wpdb->prepare("SELECT blog_id FROM $wpdb->blogs"));
-				$multisite = 1;        
-		}
-	}
-	
-	//print_r($blogids);exit;
-		
-	if (count($blogids)>1)
-	{
-		$count = count($blogids);
-	}
-	else
-	{
-		$count=1;
-	}
-	
-	for ($i=0;$i<$count;$i++)
-	{
-		if ($multisite==1)
-		{
-			 switch_to_blog($blogids[$i]);
-		}
-	
-		$sql = "CREATE TABLE {$wpdb->prefix}wptt_wpcookie_affiliate_profiles (
-			id INT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-			affiliate_url TEXT NOT NULL,
-			profile_name VARCHAR(255) NOT NULL,
-			throttle VARCHAR(255) NOT NULL,
-			throttle_pageviews INT(10) NOT NULL
-			) {$charset_collate};";
-
-		$result = $wpdb->get_results($sql, ARRAY_A);	
-		
-		$sql = "CREATE TABLE {$wpdb->prefix}wptt_wpcookie_post_profiles (
-			id INT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-			post_id VARCHAR(12) NOT NULL,
-			affiliate_profile_id VARCHAR(12) NOT NULL,
-			drop_count INT(12) NOT NULL
-			) {$charset_collate};";
-
-		$result = $wpdb->get_results($sql, ARRAY_A);
-		 
-		$sql = "CREATE TABLE {$wpdb->prefix}wptt_wpcookie_global_profiles (
-			id INT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-			keywords VARCHAR(225) NOT NULL,
-			search_content INT(1) NOT NULL,
-			search_referrer INT(1) NOT NULL,
-			affiliate_profile_id VARCHAR(12) NOT NULL,
-			status INT(1) NOT NULL,
-			exclude_items VARCHAR(225) NOT NULL,
-			drop_count INT(12) NOT NULL
-			) {$charset_collate};";
-
-		$result = $wpdb->get_results($sql, ARRAY_A);
-	}
-	
-	if ($multisite==1)
-	{
-		switch_to_blog($old_blog);
-	}
-	
-	//echo 1; exit;
-}
-
-function wptt_popups_activate() {
-   global $wpdb;		   
-	
-	if ( !empty($wpdb->charset) )
-		$charset_collate = "DEFAULT CHARACTER SET $wpdb->charset";
-	
-	if (function_exists('is_multisite') && is_multisite()) {       
-			$old_blog = $wpdb->blogid;
-            $blogids = $wpdb->get_col($wpdb->prepare("SELECT blog_id FROM $wpdb->blogs"));
-			$multisite = 1;        
-    }
-	
-	//print_r($blogids);exit;
-		
-	if (count($blogids)>1)
-	{
-		$count = count($blogids);
-	}
-	else
-	{
-		$count=1;
-	}
-	
-	for ($i=0;$i<$count;$i++)
-	{
-		if ($multisite==1)
-		{
-			 switch_to_blog($blogids[$i]);
-		}
-		
-		$result = $wpdb->get_results($sql, ARRAY_A);	
-		
-		$sql = "CREATE TABLE {$wpdb->prefix}wptt_popups_profiles (
-			id INT(20) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-			type VARCHAR(225) NOT NULL,
-			nature VARCHAR(225) NOT NULL,
-			width INT(5) NOT NULL,
-			height INT(5) NOT NULL,
-			href TEXT NOT NULL,
-			delay INT(10) NOT NULL,
-			search_keywords TEXT NOT NULL,
-			search_content INT(1) NOT NULL,
-			search_referrer INT(1) NOT NULL,
-			include_ids TEXT NOT NULL,
-			exclude_ids TEXT NOT NULL,
-			drop_count INT(12) NOT NULL,
-			status INT(1) NOT NULL,
-			notes TEXT NOT NULL
-			) {$charset_collate};";
-
-		$result = $wpdb->get_results($sql, ARRAY_A);	
-	}
-	
-	if ($multisite==1)
-	{
-		switch_to_blog($old_blog);
-	}
-	//exit;
-}
-
 function traffic_tools_javascript()
 {
 	//echo var_export(unserialize(traffic_tools_remote_connect('http://www.geoplugin.net/php.gp?ip='.$_SERVER['REMOTE_ADDR'])));
@@ -1145,89 +906,6 @@ function traffic_tools_remote_connect($url)
 	return $string;
 }
 
-function traffic_tools_activation_check()
-{
-	global $table_prefix;
-	global $wptt_options;
-	global $wpdb;
-	
-	if ($_POST['nature']=='activate_wptraffictools')
-	{
-		
-		//DISCLAIMER: nulling this software might render the software vulnerable to breaking on future updates. 
-		$wptt_options['license_key'] = $_POST['license_key'];
-		$wptt_options['license_email'] = $_POST['license_email'];	
-			
-		$url = "http://www.hatnohat.com/api/wp-traffic-tools/validate.php?key={$wptt_options['license_key']}&email={$wptt_options['license_email']}";
-		//echo $url;
-		$string = 1;
-		
-		//echo $url;
-		//echo $string; exit;
-		if ($string==1)
-		{
-
-			//setcookie('wptt_prices', '{"1":"16.97","2":"16.97","3":"16.97","4":"16.97","5":"16.97","api":"1.1.1.1.1.1.1"}' ,time()+1800,"/");
-			
-			$wptt_options = json_encode($wptt_options);
-			$multisite=0;
-			
-			if (function_exists('is_multisite') && is_multisite()&&function_exists('switch_to_blog')) {       
-					$old_blog = $wpdb->blogid;
-					$blogids = $wpdb->get_col($wpdb->prepare("SELECT blog_id FROM $wpdb->blogs"));
-					$multisite = 1;        
-			}
-			//echo 1; exit;
-			//print_r($blogids);exit;
-				
-			if (count($blogids)>1)
-			{
-				$count = count($blogids);
-			}
-			else
-			{
-				$count=1;
-			}
-
-			//echo $count;exit;
-			for ($i=0;$i<$count;$i++)
-			{
-				//echo $i;
-				if ($multisite==1)
-				{
-					 switch_to_blog($blogids[$i]);
-				}
-					if ( ! function_exists( 'is_plugin_active' ) )
-						require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
-						// Makes sure the plugin is defined before trying to use it
-				 
-					if ( is_plugin_active( 'wp-traffic-tools/wp-traffic-tools.php') ) 
-					{
-						//echo $global_default_classification_prefix;
-						$query = "UPDATE {$table_prefix}wptt_wptraffictools_options SET option_value='$wptt_options' WHERE option_name='wptt_options'";
-						$result = mysql_query($query);
-						if (!$result) { echo $query; echo mysql_error(); }	
-					}
-			}
-			
-			if ($multisite==1)
-			{
-				switch_to_blog($old_blog);
-			}
-
-			//exit;
-			echo "<center><br><br><font style='color:green;'>Congratulations! WP Traffic Tools is now registered.<br> </font>";
-			echo "<center><a href='?page=wp-traffic-tools/wp-traffic-tools.php'>Go to Administration Panel.</a> </font>";
-			exit;
-			
-		}
-		else
-		{
-			echo "<center><br><br><font style='color:red;'>ooops. typo. try again.</font>";
-		}
-	}
-}
-
 function traffic_tools_options_buffer_page()
 {
 	global $table_prefix;
@@ -1235,137 +913,18 @@ function traffic_tools_options_buffer_page()
 	
 	//PHP SAVE SETTINGS
 	traffic_tools_javascript();
-	traffic_tools_activation_check();
 	
-	//if active show rest of page
-	if (strlen($global_wptt)>2)
-	{
-		//CSS CONTENT
-		//include('wptt_style.php');
-		traffic_tools_update_check();
-		traffic_tools_options_page();
-		define('wptt_options_page', '1' );
-	}
-	else
-	{
-		//CSS CONTENT
-		//include('wptt_style.php');
-		traffic_tools_activate_prompt(); 
-		wptt_display_footer();
-		exit;
-	}
+	//CSS CONTENT
+	//include('wptt_style.php');
+	traffic_tools_update_check();
+	traffic_tools_options_page();
+	define('wptt_options_page', '1' );
+
 }
 
 function traffic_tools_update_check() 
 {
-	global $table_prefix;
-	global $wptt_current_version;
-	$url = 'http://www.hatnohat.com/api/wp-traffic-tools/version_check.php';
-	$server_version = wp_remote_get($url);
 	
-	if (!is_array($server_version) || is_wp_error( $server_version ))
-		return;
-		
-	$server_version = $server_version['body'];
-	//echo $server_version;
-	
-	//echo "<hr>";
-//	echo $wptt_current_version;exit;
-	if ($wptt_current_version<$server_version)
-	{
-		//display upgrade prompt message
-		echo "<div class='update-nag'  $wptt_current_version<b>WP Traffic Tools $server_version</b> is available! <a id='id_button_update_wptraffictools' style='cursor:pointer;' >Please update now</a>. To find out more about this update please visit the WP Traffic Tools <a href='http://www.wptraffictools.com/category/blog/' target=_new>News Blog</a></div>";
-	}
-}
-
-
-function traffic_tools_activate_prompt()
-{
-	$this_key = md5($wordpress_url.$_SERVER['REMOTE_ADDR']);
-	global $global_wptt, $global_wptt_handle;
-	//echo $global_wptt;exit;
-	//check for update
-	echo "<center><img src='".WPTRAFFICTOOLS_URLPATH."images/wptt_logo.png'></center>";
-	?>
-	
-	<form action='?page=wp-traffic-tools/wp-traffic-tools.php' id='id_form_activate_wptraffictools' method='post'>
-	<input type='hidden' name='nature' value='activate_wptraffictools'>
-	<center>
-	<br><br>
-	<table>
-		<tr>
-			<td  align=left style="font-size:13px;">
-				License Key:
-			</td>
-			<td  align=left style="font-size:13px;">
-				<input name=license_key size=30 value='<?php echo $global_wptt; ?>'>
-			</td>
-		</tr> 
-		<tr>
-			<td  align=left style="font-size:13px;">
-				License Email:
-			</td>
-			<td  align=left style="font-size:13px;">
-				<input name=license_email size=30 value='<?php echo $global_wptt_handle; ?>'><br>
-			</td>
-		</tr>
-		<tr>
-			<td colspan=2>
-				<br>
-				<center>
-					<div style='height:27px;'><a id="id_button_activate_wptraffictools" class="button"  style="padding-left:51px;padding-right:53px;cursor:pointer;" >Activate Now</a></div>
-				</center>
-				<br>
-				<center>
-					<div style='height:90px;font-size:11px;'>Don't have a license key yet? <a id="id_button_activate_wptraffictools" href='http://www.hatnohat.com/api/wp-traffic-tools/register.php?key=<?php echo $this_key; ?>' target='_blank' >Register Here!</a></div>
-				</center>
-			</td>
-		</tr>
-	</table>
-	</center>
-	</form>
-	<?php
-}
-
-function traffic_tools_license_prompt()
-{
-	$this_key = md5($wordpress_url.$_SERVER['REMOTE_ADDR']);
-	global $global_wptt, $global_wptt_handle;
-	//echo $global_wptt;exit;
-	//check for update
-	?>
-	
-	<form action='?page=wp-traffic-tools/wp-traffic-tools.php' id='id_form_activate_wptraffictools' method='post'>
-	<input type='hidden' name='nature' value='activate_wptraffictools'>
-	<table>
-		<tr>
-			<td  align=left style="font-size:13px;">
-				License Key:
-			</td>
-			<td  align=left style="font-size:13px;">
-				<input name=license_key size=30 value='<?php echo $global_wptt; ?>'>
-			</td>
-		</tr> 
-		<tr>
-			<td  align=left style="font-size:13px;">
-				License Email:
-			</td>
-			<td  align=left style="font-size:13px;">
-				<input name=license_email size=30 value='<?php echo $global_wptt_handle; ?>'><br>
-			</td>
-		</tr>
-		<tr>
-			<td colspan=2>
-				<br>
-				<center>
-					<div style='height:27px;'><a id="id_button_activate_wptraffictools" class="button"  style="padding-left:51px;padding-right:53px;cursor:pointer;" >Update License Information</a></div>
-				</center>
-				<br>				
-			</td>
-		</tr>
-	</table>
-	</form>
-	<?php
 }
 
 
@@ -1374,9 +933,7 @@ function wptt_display_footer()
 	echo "<div class='wptt_footer'><a href='http://www.wptraffictools.com/members/download.php' target='_blank'>WP Traffic Tools Download</a> &nbsp;|&nbsp;";
 	echo " <a href='".WPTRAFFICTOOLS_URLPATH."update_sql.php?debug=1&all=1' target='_blank'>Repair Tables</a> &nbsp;|&nbsp;";
 	echo " <a href='".WPTRAFFICTOOLS_URLPATH."update.php' target='_blank'>Force Update</a> &nbsp;|&nbsp;";
-	echo " <a href='http://www.hatnohat.com/forum/' target='_blank'>Hatnohat Forums</a> &nbsp;|&nbsp;";
-	echo " <a href='http://www.facebook.com/pages/Hatnohat-Presents/194421687281739' target='_blank'>Follow us on Facebook!</a> &nbsp;|&nbsp;";
-	echo " <a href='https://plus.google.com/115026361664097398228' target='_blank'>Google+</a></div>";
+	echo " <a href='https://www.twitter.com/' target='_blank'>@atwellpub</a></div>";
 	
 
 }
@@ -1392,22 +949,7 @@ function traffic_tools_options_page()
 
 if (is_admin())
 {
-	if (!isset($_COOKIE['wptt_prices']))
-	{
-		
-		$url = "http://www.hatnohat.com/api/wp-traffic-tools/validate.php?mode=2&key={$global_wptt}&email={$global_wptt_handle}";
-		//$return = traffic_tools_remote_connect($url);
-		setcookie('wptt_prices', '1.1.1.1.1.1' ,time()+1800,"/");
-		$return = json_decode($return,true);
-	}
-	else
-	{
-		$cookie = stripslashes($_COOKIE['wptt_prices']);
-		$return = json_decode($cookie,true);
-	}
-	//echo $url;
-	//echo $_COOKIE['wptt_prices'];exit;
-	
+	setcookie('wptt_prices', '1.1.1.1.1.1' ,time()+1800,"/");
 	$rp = "1.1.1.1.1.1";
 	$rp = explode(".",$rp);
 }
@@ -1427,30 +969,11 @@ if ($pm[1]==1)
 {
 	include_once('wp-redirect-controller.php');
 }
-if ($pm[2]==1)
-{
-	include_once('wp-cookie-profiles.php');
-}
-if ($pm[3]==1)
-{
-	include_once('wp-advertisement-profiles.php');
-}
-if ($pm[4]==1)
-{
-	include_once('wp-popup-profiles.php');
-}
-if ($pm[6]==1)
-{
-	include_once('wptt-smart404.php');
-}
 
 
 register_activation_hook(__FILE__, 'cloakme_activate');
 register_activation_hook(__FILE__, 'redirect_activate');
-register_activation_hook(__FILE__, 'cookie_activate');
 register_activation_hook(__FILE__, 'traffic_tools_activate');
-register_activation_hook(__FILE__, 'advertisements_activate');
-register_activation_hook(__FILE__, 'wptt_popups_activate');
 
 //exit;
 function traffic_tools_add_menu()
@@ -1463,38 +986,13 @@ function traffic_tools_add_menu()
 	{
 		add_menu_page( "WP Traffic Tools", "Traffic Tools", 'edit_pages', __FILE__, 'traffic_tools_options_buffer_page', plugins_url('wp-traffic-tools/images/wordpress.png'), '300');
 		add_submenu_page(__FILE__,'Module Setup', 'Module Setup',  'edit_pages', __FILE__, 'wptt_display_setup');
-		if ($pm[0]==1)
-		{
-			add_submenu_page(__FILE__,'Link Profiles', 'Link Profiles',  'edit_pages',"wptt_slug_submenu_link_profiles", 'wptt_display_link_profiles');
-		}
-		if ($pm[1]==1)
-		{
-			add_submenu_page(__FILE__,'Redirection Profiles', 'Redirection Profiles',  'edit_pages', 'wptt_slug_submenu_redirection_profiles', 'wptt_display_redirection_profiles');
-		}
-		if ($pm[2]==1)
-		{
-			add_submenu_page(__FILE__,'Cookie Profiles', 'Cookie Profiles',  'edit_pages', 'wptt_slug_submenu_cookie_profiles', 'wptt_display_cookie_profiles');
-		}
-		if ($pm[3]==1)
-		{
-			add_submenu_page(__FILE__,'Advertisement Profiles', 'Advertisement Profiles',  'edit_pages', 'wptt_slug_submenu_advertisement_profiles', 'wptt_display_advertisement_profiles');
-		}
-		if ($pm[4]==1)
-		{
-			add_submenu_page(__FILE__,'Popup Profiles', 'Popup Profiles',  'edit_pages', 'wptt_slug_submenu_popup_profiles', 'wptt_display_popup_profiles');
-		}
-		if ($pm[5]==1)
-		{
-			add_submenu_page(__FILE__,'TopSearches', 'Top Searches',  'edit_pages', 'wptt_slug_submenu_topsearches', 'wptt_display_topsearches');
-		}
-		if ($pm[6]==1)
-		{
-			add_submenu_page(__FILE__,'404 Handling', '404 Handling',  'edit_pages', 'wptt_slug_smart404_setup_admin', 'smart404_options_page');
-		}		
-		if ($pm[0]==1||$pm[2]==1||$pm[4]==1)
-		{
-			add_submenu_page(__FILE__,'Spider Definitions', 'Spider Definitions',  'edit_pages', 'wptt_slug_submenu_spider_settings', 'wptt_display_spider_settings');
-		}
+
+		add_submenu_page(__FILE__,'Link Profiles', 'Link Profiles',  'edit_pages',"wptt_slug_submenu_link_profiles", 'wptt_display_link_profiles');		
+
+		add_submenu_page(__FILE__,'Redirection Profiles', 'Redirection Profiles',  'edit_pages', 'wptt_slug_submenu_redirection_profiles', 'wptt_display_redirection_profiles');
+		
+		add_submenu_page(__FILE__,'Spider Definitions', 'Spider Definitions',  'edit_pages', 'wptt_slug_submenu_spider_settings', 'wptt_display_spider_settings');
+		
 		    
 	}
 	//print_r($menu);
@@ -1580,11 +1078,7 @@ function wptt_setup_update_settings()
 		//echo 1;exit;
 		$modules['link_module'] = $_POST['wptt_link_module'];
 		$modules['redirection_module'] = $_POST['wptt_redirection_module'];
-		$modules['cookie_module'] = $_POST['wptt_cookie_module'];
-		$modules['advertisements_module'] = $_POST['wptt_advertisements_module'];
-		$modules['popups_module'] = $_POST['wptt_popups_module'];
-		$modules['topsearches_module'] = $_POST['wptt_topsearches_module'];
-		$modules['smartfour_module'] = $_POST['wptt_404_module'];
+
 		
 		foreach ($modules as $key=>$val)
 		{
@@ -1654,7 +1148,7 @@ function wptt_filter_spiders()
 		$visitor_ip = $_SERVER['REMOTE_ADDR'];
 		$referrer = $_SERVER['HTTP_REFERER'];
 	}
-	
+
 	$query = "SELECT `option_value` FROM {$table_prefix}wptt_wptraffictools_options WHERE option_name='wptt_options' ORDER BY id ASC";
 	$result = mysql_query($query);
 
@@ -1680,41 +1174,22 @@ function wptt_filter_spiders()
 	foreach ($useragents as $k=>$v)
 	{
 		$v = trim($v);
+		 
 		if(stristr($visitor_useragent, $v)||$v=='*')
-		{					
-			if ($ip_addresses)
+		{	
+				     
+			$query = "SELECT * FROM wptt_ip_addresses WHERE string = '$visitor_ip' LIMIT 1";
+			$result = mysql_query($query);
+			if (!$result) { echo $query; echo mysql_error(); exit;}	
+			$count = mysql_num_rows($result);
+			if ($count>0)
 			{
-				if ($shadowmaker_username)
-				{
-					$query = "SELECT * FROM wptt_ip_addresses WHERE string = '$visitor_ip' LIMIT 1";
-					$result = mysql_query($query);
-					if (!$result) { echo $query; echo mysql_error(); exit;}	
-					$count = mysql_num_rows($result);
-					if ($count>0)
-					{
-						//is spider cause ip is in db
-						return 0;
-					}
-				}
-				else
-				{
-				    
-		            $ip_addresses = explode(';', $ip_addresses);
-					foreach ($ip_addresses as $key=>$val)
-					{
-						if($visitor_ip==$val)
-						{
-							//is spider because ip is in db
-							return 0;
-						}
-					}
-					
-				}
-			}
-			else
-			{
-				//is not spider because useragent is in whitelist
-				return 1;
+				//is spider cause ip is in db
+				return 0;
+			} else {
+			    //is human because passed useragent check and ip check
+			   return 1;
+			   
 			}
 		}			
 	}

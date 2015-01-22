@@ -35,37 +35,19 @@
 	function wptt_display_setup()
 	{
 		global $global_wptt;
-		//cookie_update_settings();
-		//cookie_add_javascript();
-		//traffic_tools_javascript();
-		//traffic_tools_update_check();
-		
-		//if active show rest of page
-		if (strlen($global_wptt)>2)
-		{
-			include('wptt_style.php');
-			echo "<img src='".WPTRAFFICTOOLS_URLPATH."images/wptt_logo.png'>";
-			
-			echo "<div id='id_wptt_display' class='class_wptt_display'>";
-		
-			echo '<div class="wrap">';
 
-			echo "<h2>Administration & Optimization</h2>";
-			wptt_setup_settings();
-			wptt_display_footer();
-			echo '</div>';
-			echo '</div>';
+		include('wptt_style.php');
+		echo "<img src='".WPTRAFFICTOOLS_URLPATH."images/wptt_logo.png'>";
+		
+		echo "<div id='id_wptt_display' class='class_wptt_display'>";
+	
+		echo '<div class="wrap">';
 
-		}
-		else
-		{
-			//CSS CONTENT
-			include('wptt_style.php');
-			traffic_tools_activate_prompt(); 
-			exit;
-		}
-		
-		
+		echo "<h2>Administration & Optimization</h2>";
+		wptt_setup_settings();
+		wptt_display_footer();
+		echo '</div>';
+		echo '</div>';
 
 	}
 	

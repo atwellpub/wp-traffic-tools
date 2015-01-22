@@ -623,8 +623,7 @@ RewriteRule ^(.*)spacer\.gif$ ".WPTRAFFICTOOLS_URLPATH."images/spacer.php [L]";
 	{			
 		autolinking_update_settings();
 		autolinking_add_javascript();
-		
-		traffic_tools_activation_check();
+	
 		//CSS CONTENT
 		include('wptt_style.php');
 		echo "<img src='".WPTRAFFICTOOLS_URLPATH."images/wptt_logo.png'>";
