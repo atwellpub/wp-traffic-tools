@@ -3,19 +3,21 @@
 Plugin Name: WP Traffic Tools
 Plugin URI: http://www.wptraffictools.com
 Description: Link Masking, Click Tracking, Keyword Linking, Conditional Redirection, Conditional Ad Placement, Cookie Management, Smart 404 Redirections, Searches to Tags, Traffic Management
-Version: 6.2.1.1
+Version: 7.2
 Author: Hudson Atwell
-Author URI: http://www.hatnohat.com/
+Author URI: http://www.hudsonatwell.co
 */
 
-if (!$_SESSION)session_start();
+if (!isset($_SESSION)) {
+	session_start();
+}
 define('WPTRAFFICTOOLS_URLPATH', WP_PLUGIN_URL.'/'.plugin_basename( dirname(__FILE__) ).'/' );
 define('WPTRAFFICTOOLS_PATH', WP_PLUGIN_DIR.'/'.plugin_basename( dirname(__FILE__) ).'/' );
-define('WPTT_CURRENT_VERSION', '6.2.1.1' );
+define('WPTT_CURRENT_VERSION', '7.2' );
 //define("QUICK_CACHE_ALLOWED", false);
 //define("DONOTCACHEPAGE", true);
 //$_SERVER["QUICK_CACHE_ALLOWED"] = false;
-wptt_setup_update_settings();
+
 
 
 /* Retrieve the global settings */ 
@@ -40,14 +42,8 @@ if ($result)
 	$global_nofollow_links = $wptt_options['nofollow_links'];
 	$global_wptt = $wptt_options['license_key'];
 	$global_wptt_handle = $wptt_options['license_email'];
-	if (!$_SESSION['wptt_permissions'])
-	{
-		$global_permissions = $wptt_options['permissions'];
-	}
-	else
-	{
-		$global_permissions = $_SESSION['wptt_permissions'];
-	}
+	$global_permissions = '1.1.1.1.1.1.1';
+	
 	$wptt_current_version = $wptt_options['current_version'];
 	
 	$global_mask_link_profiles = $wptt_options['cloak_link_profiles'];
@@ -72,8 +68,8 @@ if ($result)
 	$global_cloak_exceptions = $wptt_options['cloak_exceptions'];	
 	$global_cloak_patterns = $wptt_options['cloak_patterns'];	
 	$global_popups_cookie_timeout = $wptt_options['popups_cookie_timeout'];
-	$global_shadowmaker_username = $wptt_options['shadowmaker_username'];
-	$global_shadowmaker_password = $wptt_options['shadowmaker_password'];
+	$global_shadowmaker_username = (isset($wptt_options['shadowmaker_username'])) ? $wptt_options['shadowmaker_username'] : '';
+	$global_shadowmaker_password = (isset($wptt_options['shadowmaker_password'])) ? $wptt_options['shadowmaker_password'] : '';
 	
 }
 else
@@ -93,14 +89,14 @@ if (substr($wordpress_url, -1, -1)!='/')
 //$wordpress_url = str_replace('www.','',$wordpress_url);
 $current_url = "http://".$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"]."";
 unset($referrer);
-$referrer= $_SERVER['HTTP_REFERER'];
+$referrer= (isset($_SERVER['HTTP_REFERER'])) ? $_SERVER['HTTP_REFERER'] : '' ;
 $referrer= str_replace("+",' ',$referrer);
 $referrer= str_replace("-",' ',$referrer);
 $referrer = str_replace('%20', ' ', $referrer);
 //echo $referrer;exit;
 function wptt_gather_search_data()
 {	
-	$original_referrer = $_SERVER['HTTP_REFERER'];
+	$original_referrer = (isset($_SERVER['HTTP_REFERER'])) ? $_SERVER['HTTP_REFERER'] : '' ;
 	global $referrer;
 	global $current_url;
 	global $table_prefix;
@@ -1050,55 +1046,6 @@ function wptt_init_enqueue() {
 add_action('init', 'wptt_init_enqueue');
 add_filter('wp_head', 'wptt_checkuser');
 
-function wptt_setup_update_settings()
-{		
-	global $table_prefix;
-	global $wptt_options;
-	
-	if ($_POST['this_action']=='wptt_permissions_update')
-	{
-		/* Retrieve the global settings */ 
-		$query = "SELECT `option_value` FROM {$table_prefix}wptt_wptraffictools_options WHERE option_name='wptt_options' ORDER BY id ASC";
-		$result = mysql_query($query);
-
-		if ($result)
-		{
-
-			$array = mysql_fetch_array($result);
-			$wptt_options = $array['option_value'];
-			$wptt_options = str_replace("\r\n", "\n", $wptt_options);
-			$wptt_options = str_replace("\r", "\n", $wptt_options);
-			$wptt_options = str_replace("\n", "\\n", $wptt_options);
-			$wptt_options = json_decode($wptt_options, true);
-			//var_dump($wptt_options);exit;
-			
-
-		}
-		
-		//echo 1;exit;
-		$modules['link_module'] = $_POST['wptt_link_module'];
-		$modules['redirection_module'] = $_POST['wptt_redirection_module'];
-
-		
-		foreach ($modules as $key=>$val)
-		{
-			if ($val!=1)
-			{
-				$modules[$key]=0;
-			}
-		}
-		
-		$wptt_options['permissions'] = implode(".",$modules);
-		//$_SESSION['wptt_permissions'] = $wptt_options['permissions'];
-		
-		$wptt_options = json_encode($wptt_options);
-		//echo $global_default_classification_prefix;
-		$query = "UPDATE {$table_prefix}wptt_wptraffictools_options SET option_value='$wptt_options' WHERE option_name='wptt_options'";
-		$result = mysql_query($query);
-		if (!$result) { echo $query; echo mysql_error(); }	
-
-	}
-}
 
 function wptt_decode_unicode_url($str)
 {

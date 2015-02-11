@@ -976,7 +976,7 @@ define('REDIRECT_URLPATH', WP_PLUGIN_URL.'/'.plugin_basename( dirname(__FILE__) 
 		global $current_url;
 
 		$blog_url = $wordpress_url;
-		$referrer = $_SERVER['HTTP_REFERER'];
+		$referrer = (isset($_SERVER['HTTP_REFERER'])) ? $_SERVER['HTTP_REFERER'] : '' ;
 		//echo $referrer;
 		//echo "<br>";
 		//exit;
@@ -997,8 +997,12 @@ define('REDIRECT_URLPATH', WP_PLUGIN_URL.'/'.plugin_basename( dirname(__FILE__) 
 		else
 		{
 			$cat = get_the_category($post_id);
-			$cat = $cat[0];
-			$category_id = $cat->term_id;
+			if ($cat) {
+				$cat = $cat[0];
+				$category_id = $cat->term_id;
+			} else {
+				$category_id = null;
+			}
 
 		}
 
@@ -1010,7 +1014,7 @@ define('REDIRECT_URLPATH', WP_PLUGIN_URL.'/'.plugin_basename( dirname(__FILE__) 
 		//first check post id
 
 		//cpa-redirection check
-		if ($_POST['wptt_rnow']) {
+		if (isset($_POST['wptt_rnow'])) {
 			$url = $_POST['wptt_rnow'];
 			header("Location: $url");
 			exit;

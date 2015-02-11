@@ -17,11 +17,12 @@ $timezone_format = _x('Y-m-d', 'timezone date format');
 $date =  date_i18n($timezone_format);
 
 $permalink = $_GET['permalink'];
+
 $parts = explode('?',$permalink);
 $permalink = $parts[0];
-if ($parts[1])
+if (isset($parts[1]))
 {
-	$params = $parts[1];
+	$params = explode('&',$parts[1]);
 }
 
 //check for extra parameters
@@ -60,8 +61,7 @@ if (strstr($permalink,' '))
 
 //clean up permalink
 $permalink = str_replace('/','',$permalink);
-//echo $extra_parameters;exit;
-$referrer = $_SERVER['HTTP_REFERER'];
+$referrer = (isset($_SERVER['HTTP_REFERER'])) ? $_SERVER['HTTP_REFERER'] : '' ;
 
 
 if (!$keywords_nature)
@@ -73,7 +73,7 @@ if (!$keywords_query)
 	$keywords_query = 'n/a';
 }
 
-$wordpress_url = get_bloginfo( url ); 
+$wordpress_url = get_bloginfo( 'url' ); 
 if (substr($wordpress_url, -1, -1)!='/')
 {
 	$wordpress_url = $wordpress_url."/";
@@ -115,7 +115,7 @@ if ($spider_check!=1)
 		
 		$useragents = $wptt_options['useragents'];
 		$ip_addresses = $wptt_options['ip_addresses'];
-		$shadowmaker_username = $wptt_options['shadowmaker_username'];
+		$shadowmaker_username = (isset($wptt_options['shadowmaker_username'])) ? $wptt_options['shadowmaker_username'] : '';
 	}
 	
 	$useragents = explode(';', $useragents);
@@ -207,7 +207,7 @@ while ($arr = mysql_fetch_array($result))
 	$spoof_referrer_url = trim($arr['spoof_referrer_url']);
 	$spoof_referrer_url =  preg_split("/[\r\n,]+/", $spoof_referrer_url, -1, PREG_SPLIT_NO_EMPTY);
 	$rand_key = array_rand($spoof_referrer_url);
-	$spoof_referrer_url = $spoof_referrer_url[$rand_key];
+	$spoof_referrer_url = (isset($spoof_referrer_url[$rand_key])) ? $spoof_referrer_url[$rand_key] : '';
 	$redirect_spider = $arr['redirect_spider'];
 	$redirect_method = $arr['redirect_method'];
 	$redirect_method_url = $arr['redirect_method_url'];
@@ -317,7 +317,11 @@ if ($go==1)
 			
 			$rotate_count_marker = get_option('wptt_rotate_count_'.$redirect_id, 0);
 			
-			if ($rotate_count_marker>$rotate_urls_count)
+			if ($count==1) {
+				$rotate_marker = 0;
+				$next_key = 0;
+			}
+			else if ($rotate_count_marker>$rotate_urls_count)
 			{
 				update_option('wptt_rotate_count_'.$redirect_id, 1 );
 				if(empty($rotate_marker))
@@ -354,6 +358,7 @@ if ($go==1)
 			$result = mysql_query($query);
 			if (!$result){echo $query; echo mysql_error(); exit;}
 
+			if (isset($redirect_url[$rotate_marker]))
 			$redirect_url = $redirect_url[$rotate_marker];
 		}
 		else
@@ -365,25 +370,52 @@ if ($go==1)
 	}
 	
 	$redirect_url = trim($redirect_url);
-	if ($extra_parameters)
+	if (isset($extra_parameters))
 	{
 		$redirect_url = $redirect_url.$extra_parameters;
 	}
-	if ($params)
-	{
+	
+
+	if (defined('WPTT_CLOAKED_LINK_DEFAULT_PARAM')){
+		$defaults = array();
+		parse_str( WPTT_CLOAKED_LINK_DEFAULT_PARAM , $defaults );
+		
+		if (isset($params)) {
+			foreach ( $defaults as $key=>$value) {
+				if (isset($params[$key])) {
+					unset($defaults[$key]);
+				}
+			}
+			$params = $params + $defaults;
+		}else {
+			$params = $defaults;
+		}
+		
+	}
+	
+	if (isset($params)) {		
+		
 		if (strstr($redirect_url,'?'))
 		{
-			$redirect_url = $redirect_url.'&'.$params;
+			foreach ( $params as $key=>$param ) {
+				$redirect_url = $redirect_url.'&'.$key .'='.$param;
+			}
+			
 		}
 		else
 		{
-			$redirect_url = $redirect_url.'?'.$params;
+			$i=0;
+			foreach ( $params as $key=>$param ) {
+				if ($i==0) {				
+					$redirect_url = $redirect_url.'?'.$key .'='.$param;
+				}else {
+					$redirect_url = $redirect_url.'&'.$key .'='.$param;
+				}
+				$i++;
+			}
 		}
 	}
 	
-	//echo 1;
-	//echo $geo_array;
-	//print_r($geo_array);exit;
 	if ($spider!=1)
 	{
 		$query = "UPDATE {$table_prefix}wptt_cloakme_profiles SET visitor_count = visitor_count+1 WHERE permalink='$permalink'";

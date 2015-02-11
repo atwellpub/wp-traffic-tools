@@ -28,7 +28,7 @@ if ($mode=='links')
 		$result = mysql_query($query);
 		if (!$result){echo $query; echo mysql_error(); exit;}
 		$arr = mysql_fetch_array($result);
-		$cloaking_classification_prefix =$arr[option_value];
+		$cloaking_classification_prefix =$arr['option_value'];
 		$cloaking_classification_prefix = explode(';',$cloaking_classification_prefix);
 		//echo $classification_prefix;exit;
 		$c=$rp[0];
@@ -375,18 +375,6 @@ if ($mode=='links')
 									<option value='_self' <?php if ($cloaking_keywords_target_page=='_self'){ echo "selected='true'"; } ?>>Same page</option>
 									<option value='_blank' <?php if ($cloaking_keywords_target_page=='_blank'){ echo "selected='true'"; } ?>>New Tab</option>
 								</select>
-							</td>
-						</tr>
-						<tr class='class_tr_link_masking' id='id_tr_additional_cookie' <?php if ($cloaking_link_masking==0&&$nature=='edit'){echo "style='display:none;'";}?>>
-							<td style='border:0'>
-								<label for=keyword>
-									<img src="<?php echo WPTRAFFICTOOLS_URLPATH; ?>images/tip.png" style="cursor:pointer;" border=0 title="Prior to redirect, cookies will be loaded from this URL.">
-									Additionaly stuff this cookie on redirects
-								</label>
-							</td>
-							<td style='border:0'>
-								<input <?php echo $add; ?> <?php echo $addb; ?> type=text size=67 id='id_cloaking_stuff_cookie' name='stuff_cookie'  value='<?php echo $cloaking_stuff_cookie; ?>' >
-
 							</td>
 						</tr>
 						<tr>
